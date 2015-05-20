@@ -27,6 +27,7 @@ NSUInteger DeviceSystemMajorVersion() {
 {
     float _lowerTouchOffset;
     float _upperTouchOffset;
+    float _progressTouchOffset;
     float _stepValueInternal;
 }
 
@@ -82,17 +83,20 @@ NSUInteger DeviceSystemMajorVersion() {
     
     _lowerValue = _minimumValue;
     _upperValue = _maximumValue;
+    _progressValue = _minimumValue;
     
     _lowerMaximumValue = NAN;
     _upperMinimumValue = NAN;
     _upperHandleHidden = NO;
     _lowerHandleHidden = NO;
+    _progressHidden = YES;
     
     _lowerHandleHiddenWidth = 2.0f;
     _upperHandleHiddenWidth = 2.0f;
     
     _lowerTouchEdgeInsets = UIEdgeInsetsMake(-5, -5, -5, -5);
     _upperTouchEdgeInsets = UIEdgeInsetsMake(-5, -5, -5, -5);
+    _progressTouchEdgeInsets = UIEdgeInsetsMake(-5, -5, -5, -5);
 
     [self addSubviews];
 
@@ -166,6 +170,16 @@ NSUInteger DeviceSystemMajorVersion() {
     [self setNeedsLayout];
 }
 
+- (void)setProgressValue:(float)value
+{
+    value = MAX(value, _lowerValue);
+    value = MIN(value, _upperValue);
+    
+    _progressValue = value;
+    
+    [self setNeedsLayout];
+}
+
 
 - (void) setLowerValue:(float) lowerValue upperValue:(float) upperValue animated:(BOOL)animated
 {
@@ -218,15 +232,21 @@ NSUInteger DeviceSystemMajorVersion() {
     [self setLowerValue:NAN upperValue:upperValue animated:animated];
 }
 
-- (void) setLowerHandleHidden:(BOOL)lowerHandleHidden
+- (void)setLowerHandleHidden:(BOOL)lowerHandleHidden
 {
     _lowerHandleHidden = lowerHandleHidden;
     [self setNeedsLayout];
 }
 
-- (void) setUpperHandleHidden:(BOOL)upperHandleHidden
+- (void)setUpperHandleHidden:(BOOL)upperHandleHidden
 {
     _upperHandleHidden = upperHandleHidden;
+    [self setNeedsLayout];
+}
+
+- (void)setProgressHidden:(BOOL)progressHidden
+{
+    _progressHidden = progressHidden;
     [self setNeedsLayout];
 }
 
@@ -385,6 +405,26 @@ NSUInteger DeviceSystemMajorVersion() {
     return _upperHandleImageHighlighted;
 }
 
+- (UIImage *)progressImageNormal
+{
+    if (_progressImageNormal == nil) {
+        UIImage *image = [self imageFromBundle:@"slider-default7-handle"];
+        _progressImageNormal = [image imageWithAlignmentRectInsets:UIEdgeInsetsMake(-1, 8, 1, 8)];
+    }
+    
+    return _progressImageNormal;
+}
+
+- (UIImage *)progressImageHighlighted
+{
+    if (_progressImageHighlighted == nil) {
+        UIImage *image = [self imageFromBundle:@"slider-default7-handle"];
+        _progressImageHighlighted = [image imageWithAlignmentRectInsets:UIEdgeInsetsMake(-1, 8, 1, 8)];
+    }
+    
+    return _progressImageHighlighted;
+}
+
 // ------------------------------------------------------------------------------------------------------
 
 #pragma mark -
@@ -413,6 +453,20 @@ NSUInteger DeviceSystemMajorVersion() {
     
     value = MIN(value, _maximumValue);
     value = MAX(value, _lowerValue+_minimumRange);
+    
+    return value;
+}
+
+// Returns the progress value based on the X potion
+// The return value is automatically adjust to fit inside the valid range
+- (float)progressValueForCenterX:(float)x
+{
+    float _padding = _progressHandle.frame.size.width / 2.0;
+    
+    float value = _minimumValue + (x - _padding) / (self.frame.size.width - (_padding * 2)) * (_maximumValue - _minimumValue);
+    
+    value = MIN(value, _upperValue);
+    value = MAX(value, _lowerValue);
     
     return value;
 }
@@ -547,6 +601,11 @@ NSUInteger DeviceSystemMajorVersion() {
     self.upperHandle.frame = [self thumbRectForValue:_upperValue image:self.upperHandleImageNormal];
     
     //------------------------------
+    // Progress Handle
+    self.progressHandle = [[UIImageView alloc] initWithImage:self.progressImageNormal highlightedImage:self.progressImageHighlighted];
+    self.progressHandle.frame = [self thumbRectForValue:_progressValue image:self.progressImageNormal];
+    
+    //------------------------------
     // Track Brackground
     self.trackBackground = [[UIImageView alloc] initWithImage:self.trackBackgroundImage];
     self.trackBackground.frame = [self trackBackgroundRect];
@@ -556,20 +615,23 @@ NSUInteger DeviceSystemMajorVersion() {
     [self addSubview:self.track];
     [self addSubview:self.lowerHandle];
     [self addSubview:self.upperHandle];
+    [self addSubview:self.progressHandle];
 }
 
 
 -(void)layoutSubviews
 {
     [super layoutSubviews];
-    if(_lowerHandleHidden)
-    {
+    if (_lowerHandleHidden) {
         _lowerValue = _minimumValue;
     }
     
-    if(_upperHandleHidden)
-    {
+    if (_upperHandleHidden) {
         _upperValue = _maximumValue;
+    }
+    
+    if (_progressHidden) {
+        _progressValue = _minimumValue;
     }
 
     self.trackBackground.frame = [self trackBackgroundRect];
@@ -587,6 +649,12 @@ NSUInteger DeviceSystemMajorVersion() {
     self.upperHandle.image = self.upperHandleImageNormal;
     self.upperHandle.highlightedImage = self.upperHandleImageHighlighted;
     self.upperHandle.hidden= self.upperHandleHidden;
+    
+    // Layoput the progress handle
+    self.progressHandle.frame = [self thumbRectForValue:_progressValue image:self.progressImageNormal];
+    self.progressHandle.image = self.progressImageNormal;
+    self.progressHandle.highlightedImage = self.progressImageHighlighted;
+    self.progressHandle.hidden = self.progressHidden;
     
 }
 
@@ -620,6 +688,12 @@ NSUInteger DeviceSystemMajorVersion() {
         _upperTouchOffset = touchPoint.x - _upperHandle.center.x;
     }
     
+    if (CGRectContainsPoint(UIEdgeInsetsInsetRect(_progressHandle.frame, self.progressTouchEdgeInsets), touchPoint))
+    {
+        _progressHandle.highlighted = YES;
+        _progressTouchOffset = touchPoint.x - _progressHandle.center.x;
+    }
+    
     _stepValueInternal= _stepValueContinuously ? _stepValue : 0.0f;
     
     return YES;
@@ -628,7 +702,7 @@ NSUInteger DeviceSystemMajorVersion() {
 
 -(BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    if(!_lowerHandle.highlighted && !_upperHandle.highlighted ){
+    if (!_lowerHandle.highlighted && !_upperHandle.highlighted && !_progressHandle.highlighted) {
         return YES;
     }
     
@@ -670,6 +744,19 @@ NSUInteger DeviceSystemMajorVersion() {
         else
         {
             _upperHandle.highlighted=NO;
+        }
+    }
+    
+    if (_progressHandle.highlighted )
+    {
+        float newValue = [self progressValueForCenterX:(touchPoint.x - _progressTouchOffset)];
+        
+        // ignore if either upper or lower is selected
+        if (!_lowerHandle.highlighted && !_upperHandle.highlighted) {
+            [self setProgressValue:newValue];
+        }
+        else {
+            _progressHandle.highlighted = NO;
         }
     }
      

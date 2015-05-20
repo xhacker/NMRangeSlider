@@ -37,6 +37,9 @@
 // default 1.0. this value will be pinned to min/max
 @property(assign, nonatomic) float upperValue;
 
+// default 0.0. this value will be pinned to lowerValue/upperValue
+@property(assign, nonatomic) float progressValue;
+
 // center location for the lower handle control
 @property(readonly, nonatomic) CGPoint lowerCenter;
 
@@ -51,9 +54,11 @@
 
 @property (assign, nonatomic) UIEdgeInsets lowerTouchEdgeInsets;
 @property (assign, nonatomic) UIEdgeInsets upperTouchEdgeInsets;
+@property (assign, nonatomic) UIEdgeInsets progressTouchEdgeInsets;
 
 @property (assign, nonatomic) BOOL lowerHandleHidden;
 @property (assign, nonatomic) BOOL upperHandleHidden;
+@property (assign, nonatomic) BOOL progressHidden;
 
 @property (assign, nonatomic) float lowerHandleHiddenWidth;
 @property (assign, nonatomic) float upperHandleHiddenWidth;
@@ -71,6 +76,9 @@
 @property(retain, nonatomic) UIImage* upperHandleImageNormal;
 @property(retain, nonatomic) UIImage* upperHandleImageHighlighted;
 
+@property(retain, nonatomic) UIImage* progressImageNormal;
+@property(retain, nonatomic) UIImage* progressImageHighlighted;
+
 @property(retain, nonatomic) UIImage* trackImage;
 
 // track image when lower value is higher than the upper value (eg. when minimum range is negative
@@ -80,15 +88,16 @@
 
 @property (retain, nonatomic) UIImageView* lowerHandle;
 @property (retain, nonatomic) UIImageView* upperHandle;
+@property (retain, nonatomic) UIImageView* progressHandle;
 
 
 - (void)addSubviews;
 
 //Setting the lower/upper values with an animation :-)
-- (void)setLowerValue:(float)lowerValue animated:(BOOL) animated;
+- (void)setLowerValue:(float)lowerValue animated:(BOOL)animated;
 
-- (void)setUpperValue:(float)upperValue animated:(BOOL) animated;
+- (void)setUpperValue:(float)upperValue animated:(BOOL)animated;
 
-- (void) setLowerValue:(float) lowerValue upperValue:(float) upperValue animated:(BOOL)animated;
+- (void)setLowerValue:(float)lowerValue upperValue:(float)upperValue animated:(BOOL)animated;
 
 @end
