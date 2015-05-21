@@ -543,10 +543,10 @@ NSUInteger DeviceSystemMajorVersion() {
     
     if(_trackBackgroundImage.capInsets.left || _trackBackgroundImage.capInsets.right)
     {
-        trackBackgroundRect.size.width=self.bounds.size.width;
+        trackBackgroundRect.size.width=self.bounds.size.width - CGRectGetWidth(self.lowerHandle.frame);
     }
     
-    trackBackgroundRect.origin = CGPointMake(0, (self.bounds.size.height/2.0f) - (trackBackgroundRect.size.height/2.0f));
+    trackBackgroundRect.origin = CGPointMake(CGRectGetWidth(self.lowerHandle.frame) / 2, (self.bounds.size.height/2.0f) - (trackBackgroundRect.size.height/2.0f));
     
     // Adjust the track rect based on the image alignment rects
     
@@ -556,7 +556,7 @@ NSUInteger DeviceSystemMajorVersion() {
     return trackBackgroundRect;
 }
 
-//returms the rect of the tumb image for a given track rect and value
+//returns the rect of the tumb image for a given track rect and value
 - (CGRect)thumbRectForValue:(float)value image:(UIImage*) thumbImage
 {
     CGRect thumbRect;
@@ -613,9 +613,9 @@ NSUInteger DeviceSystemMajorVersion() {
     
     [self addSubview:self.trackBackground];
     [self addSubview:self.track];
+    [self addSubview:self.progressHandle];
     [self addSubview:self.lowerHandle];
     [self addSubview:self.upperHandle];
-    [self addSubview:self.progressHandle];
 }
 
 
