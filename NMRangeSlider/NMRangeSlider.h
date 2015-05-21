@@ -60,6 +60,9 @@
 @property (assign, nonatomic) BOOL upperHandleHidden;
 @property (assign, nonatomic) BOOL progressHidden;
 
+@property (assign, nonatomic) BOOL lowerHandleDisabled;
+@property (assign, nonatomic) BOOL upperHandleDisabled;
+
 @property (assign, nonatomic) float lowerHandleHiddenWidth;
 @property (assign, nonatomic) float upperHandleHiddenWidth;
 
