@@ -523,11 +523,11 @@ NSUInteger DeviceSystemMajorVersion() {
     float xLowerValue = ((self.bounds.size.width - lowerHandleWidth) * (_lowerValue - _minimumValue) / (_maximumValue - _minimumValue))+(lowerHandleWidth/2.0f);
     float xUpperValue = ((self.bounds.size.width - upperHandleWidth) * (_upperValue - _minimumValue) / (_maximumValue - _minimumValue))+(upperHandleWidth/2.0f);
     
-    retValue.origin = CGPointMake(xLowerValue, (self.bounds.size.height/2.0f) - (retValue.size.height/2.0f));
+    retValue.origin = CGPointMake(xLowerValue, (self.bounds.size.height/2.0f) - retValue.size.height);
     retValue.size.width = xUpperValue-xLowerValue;
 
-    UIEdgeInsets alignmentInsets = [self trackAlignmentInsets];
-    retValue = UIEdgeInsetsInsetRect(retValue,alignmentInsets);
+//    UIEdgeInsets alignmentInsets = [self trackAlignmentInsets];
+//    retValue = UIEdgeInsetsInsetRect(retValue,alignmentInsets);
     
     return retValue;
 }
@@ -561,12 +561,12 @@ NSUInteger DeviceSystemMajorVersion() {
         trackBackgroundRect.size.width=self.bounds.size.width - CGRectGetWidth(self.lowerHandle.frame);
     }
     
-    trackBackgroundRect.origin = CGPointMake(CGRectGetWidth(self.lowerHandle.frame) / 2, (self.bounds.size.height/2.0f) - (trackBackgroundRect.size.height/2.0f));
+    trackBackgroundRect.origin = CGPointMake(CGRectGetWidth(self.lowerHandle.frame) / 2, (self.bounds.size.height/2.0f) - trackBackgroundRect.size.height);
     
     // Adjust the track rect based on the image alignment rects
     
-    UIEdgeInsets alignmentInsets = [self trackAlignmentInsets];
-    trackBackgroundRect = UIEdgeInsetsInsetRect(trackBackgroundRect,alignmentInsets);
+//    UIEdgeInsets alignmentInsets = [self trackAlignmentInsets];
+//    trackBackgroundRect = UIEdgeInsetsInsetRect(trackBackgroundRect,alignmentInsets);
     
     return trackBackgroundRect;
 }
